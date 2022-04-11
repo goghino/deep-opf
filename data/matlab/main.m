@@ -23,7 +23,11 @@ constants;
 
 
 %% load the Matpower case and create Matpower options
-mpc        = case118;
+mpc        = case30; %case_ACTIVSg200;
+
+assert(all(mpc.branch(:,RATE_A) > 0)) % make sure all the line limits are defined
+% to fill the missing values use e.g. mpc.branch(missing,RATE_A) = max(mpc.branch(missing,RATE_A)); 
+% to run ED set mpc.branch(:,RATE_A)=0, then all LMP are equal
 
 OPFvoltage = POLAR;           % voltage representation
 OPFbalance = POWER;           % type of nodal balance equation
@@ -33,12 +37,30 @@ OPFmodel   = DC;              % grid model
 
 mpopt      = create_options(mpc, OPFsolver, OPFstart, OPFvoltage, OPFbalance, OPFmodel);
 
-% Perturb the load
-mpc.bus(:,PD) = 1.01*mpc.bus(:,PD);
+rand('seed',1);
+
+%% 
+% Get the global scaling
+scale_global = 30; % i.e. 30%
+
+% Get the perturbations of the global scaling
+nLoads = size(mpc.bus, 1);
+scale_local = 1 + (2*rand(nLoads,1)-1)/10;  % returns x in 1 + Uniform(-1,1)/10
+
+scale = 1 + (scale_global * scale_local)/100;
+
+% Perturb each load
+mpc.bus(:,PD) = scale.*mpc.bus(:,PD);
 
 % Run the OPF
 r = runopf(mpc, mpopt);
 
+%% Inspect the results
+%case_info(r);
+printpf(r)
+
 % Extract the QoI
 prices = r.bus(:, LAM_P);
-genpower = r.gen(:, PG);
+
+% (features, output)
+sample = [mpc.bus(:,PD) prices];
