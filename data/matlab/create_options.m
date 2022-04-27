@@ -8,7 +8,7 @@ function mpopt = create_options(mpc, solver, start, voltage, balance, model)
     %
     % Inputs
     %   mpc     - Matpower case
-    %   solver  - Optimizaiton software used to solve the OPF
+    %   solver  - Optimization software used to solve the OPF
     %   start   - Strategy for initializing OPF starting point
     %   voltage - Voltage representation
     %   balance - Type of nodal balance equation
