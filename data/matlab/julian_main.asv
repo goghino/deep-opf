@@ -57,14 +57,14 @@ rand('seed',1);               % for same random #'s each time
 % upper/lower bounds, etc
 global_low = -30;
 global_high = 30;
-global_incr = 3;
+global_incr = 1;
 
 local_low = -25;
 local_high = 25;
-local_incr = 10;
+local_incr = 1;
 
 % iterations per global*local combo
-itr = 2;
+itr = 5;
 
 for i = global_low:global_incr:global_high                % in %... 61 points
     % Get the global scaling
@@ -79,18 +79,17 @@ for i = global_low:global_incr:global_high                % in %... 61 points
                                                           
             % Corresponds to +/- j% of original values
             % returns x in 1 + Uniform(-1,1)
-            if j == 0
-                scale_local = 1 + (2*rand(nLoads,1)-1);
-                
-            else 
+            if j ~= 0
                 scale_local = 1 + (j/100)*(2*rand(nLoads,1)-1);
+            else 
+                scale_local = 1 + (2*rand(nLoads,1)-1);
             end
 
             % Combining global scaling + variability
-            if i == 0
-                scale = 1 + (scale_local)/100;      
-            else
+            if i ~= 0
                 scale = 1 + (scale_global * scale_local)/100;
+            else
+                scale = 1 + (scale_local)/100;
             end
 
             % Perturb each load
@@ -107,7 +106,7 @@ for i = global_low:global_incr:global_high                % in %... 61 points
             prices = prices';               % make each vector row
             genpower = genpower';
 
-            % total of 15555 data points
+            % total of 1555 data points
             writematrix(prices,'Thesis/github/Untitled/data/csv/case30prices.csv','WriteMode','append');
             writematrix(prices,'Thesis/github/Untitled/data/csv/case30genpowers.csv','WriteMode','append');
         end

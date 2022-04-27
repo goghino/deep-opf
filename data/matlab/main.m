@@ -37,7 +37,7 @@ OPFmodel   = DC;              % grid model
 
 mpopt      = create_options(mpc, OPFsolver, OPFstart, OPFvoltage, OPFbalance, OPFmodel);
 
-rand('seed',1);
+rand('seed',1);               % 
 
 %% 
 % Get the global scaling
