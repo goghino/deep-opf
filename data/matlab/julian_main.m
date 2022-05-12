@@ -50,32 +50,32 @@ OPFmodel   = DC;              % grid model
 
 mpopt      = create_options(mpc, OPFsolver, OPFstart, OPFvoltage, OPFbalance, OPFmodel);
 
-rand('seed',1);               % for same random #'s each time
+rand('seed',2);               % for same random #'s each time
 
 %% Running OPF
 
 % upper/lower bounds, etc
 global_low = -30;
 global_high = 30;
-global_incr = 3;
+global_incr = 1;
 
 local_low = -25;
 local_high = 25;
-local_incr = 10;
+local_incr = 1;
 
 % iterations per global*local combo
-itr = 2;
+itr = 1;
 
-for i = global_low:global_incr:global_high                % in %... 61 points
+for i = global_low:global_incr:global_high                % in percent... 61 points
     % Get the global scaling
     scale_global = i;                                     
 
     % Get the perturbations of the global scaling
     nLoads = size(mpc.bus, 1);
 
-    for j = local_low:local_incr:local_high               % in %... 51 points
+    for j = local_low:local_incr:local_high               % in percent... 51 points
         
-         for k = 1:itr                                    % 5 iterations per                                
+         for k = 1:itr                                    % # iterations per                                
                                                           
             % Corresponds to +/- j% of original values
             % returns x in 1 + Uniform(-1,1)
@@ -94,6 +94,7 @@ for i = global_low:global_incr:global_high                % in %... 61 points
             end
 
             % Perturb each load
+            original_bus = mpc.bus(:,PD);
             mpc.bus(:,PD) = scale.*mpc.bus(:,PD);
 
             % Run the OPF
@@ -101,15 +102,28 @@ for i = global_low:global_incr:global_high                % in %... 61 points
 
 
             % Extract the QoI
+            %%
+            % NOTE: 
+            % LAM_P = Lagrange multiplier on real power mismatch
+            % should we be using "COST"?
+            
+            %%
+            demands = r.bus(:, PD);
             prices = r.bus(:, LAM_P);
             genpower = r.gen(:, PG);
 
-            prices = prices';               % make each vector row
+            
+            demands = demands';
+            prices = prices';               
             genpower = genpower';
 
-            % total of 15555 data points
-            writematrix(prices,'Thesis/github/Untitled/data/csv/case30prices.csv','WriteMode','append');
-            writematrix(prices,'Thesis/github/Untitled/data/csv/case30genpowers.csv','WriteMode','append');
+            % total of ##### data points
+            writematrix(demands, 'Thesis/github/Untitled/data/csv/sample_case30_PD.csv','WriteMode','append');
+            writematrix(prices,'Thesis/github/Untitled/data/csv/sample_case30_LAM_P.csv','WriteMode','append');
+            writematrix(genpower,'Thesis/github/Untitled/data/csv/sample_case30_PG.csv','WriteMode','append');
+            
+            % restore original generator demands before next iteration
+            mpc = case30;            
         end
     end
 end
