@@ -54,10 +54,21 @@ rand('seed',2);               % for same random #'s each time
 
 %% Running OPF
 
+% IGNORE
+% Completed
+% global:
+% -30 to 30
+
+% To Do
+% -29.8 to 30.2
+
+
+
+
 % upper/lower bounds, etc
 global_low = -30;
 global_high = 30;
-global_incr = 1;
+global_incr = 0.1;
 
 local_low = -25;
 local_high = 25;
@@ -108,19 +119,25 @@ for i = global_low:global_incr:global_high                % in percent... 61 poi
             % should we be using "COST"?
             
             %%
-            demands = r.bus(:, PD);
-            prices = r.bus(:, LAM_P);
+            demands_active = r.bus(:, PD);
+            demands_reactive = r.bus(:, QD);
+            prices_active = r.bus(:, LAM_P);
+            prices_reactive = r.bus(:, LAM_Q);
             genpower = r.gen(:, PG);
 
             
-            demands = demands';
-            prices = prices';               
+            demands_active = demands_active';
+            demands_reactive = demands_reactive';
+            prices_active = prices_active';
+            prices_reactive = prices_reactive';
             genpower = genpower';
 
             % total of ##### data points
-            writematrix(demands, 'Thesis/github/Untitled/data/csv/sample_case30_PD.csv','WriteMode','append');
-            writematrix(prices,'Thesis/github/Untitled/data/csv/sample_case30_LAM_P.csv','WriteMode','append');
-            writematrix(genpower,'Thesis/github/Untitled/data/csv/sample_case30_PG.csv','WriteMode','append');
+            writematrix(demands_active, 'Thesis/github/Untitled/data/csv/case30/case30_PD.csv','WriteMode','append');
+            writematrix(demands_reactive, 'Thesis/github/Untitled/data/csv/case30/case30_QD.csv','WriteMode','append');
+            writematrix(prices_active,'Thesis/github/Untitled/data/csv/case30/case30_LAM_P.csv','WriteMode','append');
+            writematrix(prices_reactive,'Thesis/github/Untitled/data/csv/case30/case30_LAM_Q.csv','WriteMode','append');
+            writematrix(genpower,'Thesis/github/Untitled/data/csv/case30/case30_PG.csv','WriteMode','append');
             
             % restore original generator demands before next iteration
             mpc = case30;            
